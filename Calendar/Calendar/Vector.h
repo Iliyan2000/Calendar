@@ -83,7 +83,7 @@ void Vector<T>::push_back(const T& _obj)
 	{
 		reserve(2 * m_capacity);
 	}
-}
+}///////////----////
 template <typename T>
 void Vector<T>::swap(const size_t index1, const size_t index2)
 {
