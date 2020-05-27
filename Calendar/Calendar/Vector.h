@@ -29,8 +29,6 @@ private:
 	void clear();
 };
 
-//#include "Vector.impl"
-
 //public methods
 //Big four
 template <typename T>
