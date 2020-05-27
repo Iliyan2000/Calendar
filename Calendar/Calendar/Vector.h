@@ -18,6 +18,7 @@ public:
 	inline T& operator[](const size_t index) const { return obj[index]; }
 	void push_back(const T&);
 	inline void pop_back() { m_size--; }
+	void swap(const size_t index1, const size_t index2);
 	//void
 	//void 
 
@@ -82,6 +83,17 @@ void Vector<T>::push_back(const T& _obj)
 	{
 		reserve(2 * m_capacity);
 	}
+}
+template <typename T>
+void Vector<T>::swap(const size_t index1, const size_t index2)
+{
+	if (index1 >= m_size || index2 >= m_size)
+	{
+		return;
+	}
+	T temp = obj[index1];
+	obj[index1] = obj[index2];
+	obj[index2] = temp;
 }
 //private methods
 template <typename T>
