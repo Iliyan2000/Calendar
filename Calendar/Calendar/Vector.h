@@ -19,8 +19,8 @@ public:
 	void push_back(const T&);
 	inline void pop_back() { m_size--; }
 	void swap(const size_t index1, const size_t index2);
-	//void
-	//void 
+	void insert(const size_t index, const T& other);
+	void erase(const size_t index);
 
 private:
 	T* obj;
@@ -83,7 +83,7 @@ void Vector<T>::push_back(const T& _obj)
 	{
 		reserve(2 * m_capacity);
 	}
-}///////////----////
+}
 template <typename T>
 void Vector<T>::swap(const size_t index1, const size_t index2)
 {
@@ -94,6 +94,32 @@ void Vector<T>::swap(const size_t index1, const size_t index2)
 	T temp = obj[index1];
 	obj[index1] = obj[index2];
 	obj[index2] = temp;
+}
+template <typename T>
+void Vector<T>::insert(const size_t index, const T& other)
+{
+	if (index > m_size)
+	{
+		return;
+	}
+	push_back(other);
+	for (size_t i = m_size - 1; i > index; i--)
+	{
+		swap(i, i - 1);
+	}
+}
+template <typename T>
+void Vector<T>::erase(const size_t index)
+{
+	if (index >= m_size)
+	{
+		return;
+	}
+	for (size_t i = index; i < m_size - 1; i++)
+	{
+		swap(i, i + 1);
+	}
+	pop_back();
 }
 //private methods
 template <typename T>
