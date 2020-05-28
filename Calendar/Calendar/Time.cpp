@@ -143,29 +143,18 @@ std::ostream& operator<<(std::ostream& out, const Time& obj)
 {
 	if (obj.getHour() < 10)
 	{
-		out << '0' << obj.getHour();
+		out << '0';
 	}
-	else
-	{
-		out << obj.getHour();
-	}
-	out << ':';
+	out << obj.getHour() << ':';
 	if (obj.getMinute() < 10)
 	{
-		out << '0' << obj.getMinute();
+		out << '0';
 	}
-	else
-	{
-		out << obj.getMinute();
-	}
-	out << ':';
+	out << obj.getMinute() << ':';
 	if (obj.getSecond() < 10)
 	{
-		out << '0' << obj.getSecond();
+		out << '0';
 	}
-	else
-	{
-		out << obj.getSecond();
-	}
+	out << obj.getSecond();
 	return out;
 }
