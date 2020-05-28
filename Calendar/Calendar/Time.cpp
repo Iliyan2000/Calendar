@@ -20,6 +20,62 @@ bool Time::Check()
 	}
 	return false;
 }
+bool Time::operator==(const Time& other)
+{
+	if (hour == other.hour && minute == other.minute && second == other.second)
+	{
+		return true;
+	}
+	return false;
+}
+bool Time::operator!=(const Time& other)
+{
+	if (*this == other)
+	{
+		return false;
+	}
+	return true;
+}
+bool Time::operator>(const Time& other)
+{
+	if (hour > other.hour)
+	{
+		return true;
+	}
+	else if (hour == other.hour && minute > other.minute)
+	{
+		return true;
+	}
+	else if (hour == other.hour && minute == other.minute && second > other.second)
+	{
+		return true;
+	}
+	return false;
+}
+bool Time::operator>=(const Time& other)
+{
+	if (*this > other || *this == other)
+	{
+		return true;
+	}
+	return false;
+}
+bool Time::operator<(const Time& other)
+{
+	if (*this >= other)
+	{
+		return false;
+	}
+	return true;
+}
+bool Time::operator<=(const Time& other)
+{
+	if (*this < other || *this == other)
+	{
+		return true;
+	}
+	return false;
+}
 
 std::istream& operator>>(std::istream& in, Time& obj)
 {
@@ -27,6 +83,9 @@ std::istream& operator>>(std::istream& in, Time& obj)
 	in >> str;
 	size_t length = 0;
 	size_t cnt = 0;
+
+	//counting ':' will show if in the input there seconds or minutes
+	
 	while (str[length] != '\0')
 	{
 		if (str[length] == ':')
@@ -36,6 +95,9 @@ std::istream& operator>>(std::istream& in, Time& obj)
 		length++;
 	}
 	size_t i = length - 1;
+	
+	//depends on the amount of ':', give default value
+	
 	switch (cnt)
 	{
 	case 2:

@@ -5,8 +5,8 @@
 class Time
 {
 public:
-	Time(size_t _hour = 0, size_t _minute = 0, size_t second = 0);
-	Time(const Time&);
+	Time(size_t _hour = 0, size_t _minute = 0, size_t _second = 0);
+	Time(const Time& other);
 
 	inline size_t getHour() const { return hour; }
 	inline size_t getMinute() const { return minute; }
@@ -15,7 +15,12 @@ public:
 	void setMinute(const size_t _minute) { minute = _minute; }
 	void setSecond(const size_t _second) { second = _second; }
 	bool Check();
-	//operators
+	bool operator==(const Time& other);
+	bool operator!=(const Time& other);
+	bool operator>(const Time& other);
+	bool operator>=(const Time& other);
+	bool operator<(const Time& other);
+	bool operator<=(const Time& other);
 
 private:
 	size_t hour;
