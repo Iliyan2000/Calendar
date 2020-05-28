@@ -11,3 +11,16 @@ Date::Date(const Date& other)
 	month = other.month;
 	day = other.day;
 }
+
+//...
+
+std::istream& operator>>(std::istream& in, Date& obj)
+{
+	//...
+	return in;
+}
+std::ostream& operator<<(std::ostream& out, const Date& obj)
+{
+	//...
+	return out;
+}

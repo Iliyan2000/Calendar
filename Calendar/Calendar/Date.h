@@ -1,4 +1,6 @@
 #pragma once
+#include <iostream>
+
 class Date
 {
 public:
@@ -12,4 +14,5 @@ private:
 	size_t month;
 	size_t day;
 };
-
+std::istream& operator>>(std::istream& in, Date& obj);
+std::ostream& operator<<(std::ostream& out, const Date& obj);
