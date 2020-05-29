@@ -19,9 +19,10 @@ void Insert_and_sort(Vector<Holiday*>& vec, const Holiday& obj)
 	*pobj = obj;
 	for (size_t i = 0; i < length; i++)
 	{
-		if (true)
+		if (obj.getDate() < vec[i]->getDate())
 		{
-
+			vec.insert(i, pobj);
+			return;
 		}
 	}
 	vec.push_back(pobj);
