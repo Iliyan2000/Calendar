@@ -141,6 +141,7 @@
     <ClCompile Include="Booked.cpp" />
     <ClCompile Include="Date.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Holiday.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Time.cpp" />
   </ItemGroup>
