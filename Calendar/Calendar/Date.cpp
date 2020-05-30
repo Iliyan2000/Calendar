@@ -12,7 +12,7 @@ Date::Date(const Date& other)
 	day = other.day;
 }
 
-bool Date::Check()//year -20
+bool Date::Check()
 {
 	if ((month == 1 || month == 3 || month == 5 ||
 		month == 7 || month == 8 || month == 10 ||
