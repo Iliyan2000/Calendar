@@ -36,6 +36,7 @@ void Engine::book()
 	std::string name;
 	std::string note;
 	std::cin >> date >> start_time >> end_time >> name;
+	std::cin.get();
 	std::getline(std::cin, note);
 	if (!(date.Check() && start_time.Check() && end_time.Check()))
 	{
@@ -58,11 +59,12 @@ void Engine::book()
 			(start_time >= booked[i]->getStartTime() && start_time <= booked[i]->getEndTime()) &&
 			(end_time >= booked[i]->getStartTime() && end_time <= booked[i]->getEndTime()))
 		{
-			std::cout << "This date and time are booked.\n";
+			std::cout << "This date and time are commited.\n";
 			return;
 		}
 	}
 	Insert_and_sort(booked, Booked(date, start_time, end_time, name, note));
+	std::cout << "Successfully commited.\n";
 }
 void Engine::unbook()
 {
@@ -70,7 +72,32 @@ void Engine::unbook()
 }
 void Engine::agenda()
 {
-
+	Date date;
+	std::cin >> date;
+	if (!date.Check())
+	{
+		std::cout << "Incorrect date!\n";
+		return;
+	}
+	bool f = false;
+	size_t length = booked.size();
+	for (size_t i = 0; i < length; i++)
+	{
+		if (date == booked[i]->getDate())
+		{
+			std::cout << booked[i]->getStartTime() << ' ' <<
+				booked[i]->getEndTime() << ' ' << booked[i]->getName() << '\n';
+			if (booked[i]->getNote() != "")
+			{
+				std::cout << booked[i]->getNote() << '\n';
+			}
+			f = true;
+		}
+	}
+	if (!f)
+	{
+		std::cout << "There are no commitments for this date.\n";
+	}
 }
 void Engine::change()
 {
