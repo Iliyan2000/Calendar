@@ -94,6 +94,28 @@ bool Date::operator<=(const Date& other)
 	}
 	return false;
 }
+void Date::AddYear()
+{
+	year++;
+}
+void Date::AddMonth()
+{
+	month++;
+	if (!Check())
+	{
+		month = 1;
+		AddYear();
+	}
+}
+void Date::AddDay()
+{
+	day++;
+	if (!Check())
+	{
+		day = 1;
+		AddMonth();
+	}
+}
 
 std::istream& operator>>(std::istream& in, Date& obj)
 {

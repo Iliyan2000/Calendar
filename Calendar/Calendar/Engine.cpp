@@ -52,19 +52,63 @@ void Engine::book()
 			return;
 		}
 	}
-	length = booked.size();
-	for (size_t i = 0; i < length; i++)
+	std::string answer = "yes";
+	bool f = false;
+	if (start_time > end_time)
 	{
-		if (date == booked[i]->getDate() &&
-			(start_time >= booked[i]->getStartTime() && start_time <= booked[i]->getEndTime()) &&
-			(end_time >= booked[i]->getStartTime() && end_time <= booked[i]->getEndTime()))
+		f = true;
+		std::cout << "Would you like your commit to continue to the next date?[yes/no]\n";
+		std::cin >> answer;
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		if (answer == "no" || answer == "n")
 		{
-			std::cout << "This date and time are commited.\n";
+			std::cout << "The commit not saved.\n";
 			return;
 		}
 	}
-	Insert_and_sort(booked, Booked(date, start_time, end_time, name, note));
-	std::cout << "Successfully commited.\n";
+	if (answer == "yes" || answer == "y")
+	{
+		Vector<Booked> B;
+		B.push_back(Booked(date, start_time, end_time, name, note));
+		if (f)
+		{
+			Booked b;
+			B[0].Split(b);
+			B.push_back(b);
+		}
+		size_t length_B = B.size();
+		for (size_t j = 0; j < length_B; j++)
+		{
+			length = booked.size();
+			for (size_t i = 0; i < length; i++)
+			{
+				if (B[j].getDate() == booked[i]->getDate() &&
+					(B[j].getStartTime() >= booked[i]->getStartTime() && start_time <= booked[i]->getEndTime()) &&
+					(B[j].getEndTime() >= booked[i]->getStartTime() && end_time <= booked[i]->getEndTime()))
+				{
+					std::cout << "This date and time are commited.\n";
+					if (j == 1)
+					{
+						for (size_t t = 0; t < length; t++)
+						{
+							if (B[j] == *booked[t])
+							{
+								booked.erase(t);
+								break;
+							}
+						}
+					}
+					return;
+				}
+			}
+			Insert_and_sort(booked, B[j]);
+		}
+		std::cout << "Successfully commited.\n";
+	}
+	else
+	{
+		std::cout << "unknown command!\n";
+	}
 }
 void Engine::unbook()
 {

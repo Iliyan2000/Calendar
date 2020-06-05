@@ -26,6 +26,8 @@ public:
 	void setName(const std::string _name) { name = _name; }
 	void setNote(const std::string _note) { note = _note; }
 	void setFromFile(const bool _fromFile) { fromFile = _fromFile; }
+	void Split(Booked& other);
+	bool operator==(const Booked& other);
 
 private:
 	Date date;

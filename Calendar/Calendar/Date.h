@@ -20,6 +20,9 @@ public:
 	bool operator>=(const Date& other);
 	bool operator<(const Date& other);
 	bool operator<=(const Date& other);
+	void AddYear();
+	void AddMonth();
+	void AddDay();
 
 private:
 	size_t year;

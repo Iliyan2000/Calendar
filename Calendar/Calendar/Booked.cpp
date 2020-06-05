@@ -20,6 +20,27 @@ Booked::Booked(const Booked& other)
 	note = other.note;
 	fromFile = other.fromFile;
 }
+void Booked::Split(Booked& other)
+{
+	other = *this;
+	end_time = Time(23, 59, 59);
+	other.start_time = Time();
+	Date d = other.getDate();
+	d.AddDay();
+	other.setDate(d);
+}
+bool Booked::operator==(const Booked& other)
+{
+	if (date == other.date &&
+		start_time == other.start_time &&
+		end_time == other.end_time &&
+		name == other.name &&
+		note == other.note)
+	{
+		return true;
+	}
+	return false;
+}
 
 void Insert_and_sort(Vector<Booked*>& vec, const Booked& obj)
 {
