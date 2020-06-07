@@ -79,6 +79,10 @@ int main()
 			E.findslotwith();
 			continue;
 		}
+		else if (!comand.compare("merge"))
+		{
+
+		}
 		else if (comand.compare("exit"))
 		{
 			E.unknown();

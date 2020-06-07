@@ -23,6 +23,7 @@ public:
 	void busydays();
 	void findslot();
 	void findslotwith();
+	void merge();
 	void unknown();
 
 private:

@@ -93,6 +93,7 @@ void Engine::book()
 						{
 							if (B[j] == *booked[t])
 							{
+								delete booked[t];
 								booked.erase(t);
 								break;
 							}
@@ -112,7 +113,50 @@ void Engine::book()
 }
 void Engine::unbook()
 {
-
+	Date date;
+	Time start_time;
+	Time end_time;
+	std::cin >> date >> start_time >> end_time;
+	size_t length = booked.size();
+	if (start_time <= end_time)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			if (date == booked[i]->getDate() &&
+				start_time == booked[i]->getStartTime() &&
+				end_time == booked[i]->getEndTime())
+			{
+				delete booked[i];
+				booked.erase(i);
+				std::cout << "Successfully deleted the commit.\n";
+				return;
+			}
+		}
+		std::cout << "Not found commit on these date and time.\n";
+	}
+	else
+	{
+		Date next_date = date;
+		next_date.AddDay();
+		for (size_t i = 0; i < length; i++)
+		{
+			if (date == booked[i]->getDate() &&
+				start_time == booked[i]->getStartTime() &&
+				Time(23, 59, 59) == booked[i]->getEndTime() &&
+				next_date == booked[i + 1]->getDate() &&
+				Time() == booked[i + 1]->getStartTime() &&
+				end_time == booked[i + 1]->getEndTime())
+			{
+				delete booked[i];
+				booked.erase(i);
+				delete booked[i];
+				booked.erase(i);
+				std::cout << "Successfully deleted the commit.\n";
+				return;
+			}
+		}
+		std::cout << "Not found commit on these date and time.\n";
+	}
 }
 void Engine::agenda()
 {
@@ -129,7 +173,7 @@ void Engine::agenda()
 	{
 		if (date == booked[i]->getDate())
 		{
-			std::cout << booked[i]->getStartTime() << ' ' <<
+			std::cout << booked[i]->getStartTime() << '-' <<
 				booked[i]->getEndTime() << ' ' << booked[i]->getName() << '\n';
 			if (booked[i]->getNote() != "")
 			{
@@ -153,7 +197,29 @@ void Engine::find()
 }
 void Engine::f_holiday()
 {
+	Date date;
+	std::cin >> date;
+	Insert_and_sort(holiday, date);
+	size_t i = 0;
+	while (date <= booked[i]->getDate())
+	{
+		if (date == booked[i]->getDate())
+		{
+			if (true)
+			{
 
+			}
+			else
+			{
+				delete booked[i];
+				booked.erase(i);
+			}
+		}
+		else
+		{
+			i++;
+		}
+	}
 }
 void Engine::busydays()
 {
@@ -164,6 +230,10 @@ void Engine::findslot()
 
 }
 void Engine::findslotwith()
+{
+
+}
+void Engine::merge()
 {
 
 }
