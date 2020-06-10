@@ -1,7 +1,7 @@
 #include "Engine.h"
 
 Engine::Engine(const Vector<Booked*> &vec_b,
-	const Vector<Holiday*> &vec_h,
+	const Vector<Date*> &vec_h,
 	const char first_sym)
 	:booked(vec_b), holiday(vec_h)
 {
@@ -26,10 +26,24 @@ void Engine::saveas()
 }
 void Engine::help()
 {
-
+	std::cout << "The following commands are supported:\n" <<
+		"open <file>						opens <file>\n" <<
+		"close							closes currently opened file\n" <<
+		"save							saves the currently open file\n" <<
+		"saveas <file>						saves the currently open file in <file>\n" <<
+		"help							prints this information\n" <<
+		"book <date> <starttime> <endtime> <name> <note>		saves the information to the calendar\n" <<
+		"unbook <date> <starttime> <endtime>			delete the commit from the calendar\n" <<
+		"exit							exists the program\n";
 }
 void Engine::book()
 {
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
 	Date date;
 	Time start_time;
 	Time end_time;
@@ -46,7 +60,7 @@ void Engine::book()
 	size_t length = holiday.size();
 	for (size_t i = 0; i < length; i++)
 	{
-		if (date == holiday[i]->getDate())
+		if (date == *holiday[i])
 		{
 			std::cout << "This date is already a holiday.\n";
 			return;
@@ -113,10 +127,21 @@ void Engine::book()
 }
 void Engine::unbook()
 {
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
 	Date date;
 	Time start_time;
 	Time end_time;
 	std::cin >> date >> start_time >> end_time;
+	if (!(date.Check() && start_time.Check() && end_time.Check()))
+	{
+		std::cout << "Incorrect date or time!\n";
+		return;
+	}
 	size_t length = booked.size();
 	if (start_time <= end_time)
 	{
@@ -145,7 +170,9 @@ void Engine::unbook()
 				Time(23, 59, 59) == booked[i]->getEndTime() &&
 				next_date == booked[i + 1]->getDate() &&
 				Time() == booked[i + 1]->getStartTime() &&
-				end_time == booked[i + 1]->getEndTime())
+				end_time == booked[i + 1]->getEndTime() &&
+				booked[i]->getName() == booked[i + 1]->getName() &&
+				booked[i]->getNote() == booked[i + 1]->getNote())
 			{
 				delete booked[i];
 				booked.erase(i);
@@ -160,6 +187,12 @@ void Engine::unbook()
 }
 void Engine::agenda()
 {
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
 	Date date;
 	std::cin >> date;
 	if (!date.Check())
@@ -189,25 +222,60 @@ void Engine::agenda()
 }
 void Engine::change()
 {
-
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
+	Date date;
+	Time start_time;
+	std::cin >> date >> start_time;
 }
 void Engine::find()
 {
-
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
 }
 void Engine::f_holiday()
 {
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
 	Date date;
 	std::cin >> date;
+	if (!date.Check())
+	{
+		std::cout << "Incorrect date!\n";
+		return;
+	}
 	Insert_and_sort(holiday, date);
+	std::cout << "Successfully saved the date as holiday.\n";
+	if (booked.size() == 0)
+	{
+		return;
+	}
 	size_t i = 0;
-	while (date <= booked[i]->getDate())
+	while (date >= booked[i]->getDate())
 	{
 		if (date == booked[i]->getDate())
 		{
-			if (true)
+			if (Time(23, 59, 59) == booked[i]->getEndTime() &&
+				Time() == booked[i + 1]->getStartTime() &&
+				booked[i]->getName() == booked[i + 1]->getName() &&
+				booked[i]->getNote() == booked[i + 1]->getNote())
 			{
-
+				delete booked[i];
+				booked.erase(i);
+				delete booked[i];
+				booked.erase(i);
 			}
 			else
 			{
@@ -223,19 +291,39 @@ void Engine::f_holiday()
 }
 void Engine::busydays()
 {
-
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
 }
 void Engine::findslot()
 {
-
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
 }
 void Engine::findslotwith()
 {
-
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
 }
 void Engine::merge()
 {
-
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
 }
 void Engine::unknown()
 {

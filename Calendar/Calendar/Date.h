@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "Vector.h"
 
 class Date
 {
@@ -31,3 +32,4 @@ private:
 };
 std::istream& operator>>(std::istream& in, Date& obj);
 std::ostream& operator<<(std::ostream& out, const Date& obj);
+void Insert_and_sort(Vector<Date*>& vec, const Date& obj);

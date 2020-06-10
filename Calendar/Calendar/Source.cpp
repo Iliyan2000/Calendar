@@ -5,6 +5,7 @@ int main()
 	std::string comand = "";
 	Engine E;
 
+	std::cout << "To start working, first you need to open calendar.\n";
 	while (comand.compare("exit"))
 	{
 		std::cout << '>';
@@ -81,7 +82,8 @@ int main()
 		}
 		else if (!comand.compare("merge"))
 		{
-
+			E.merge();
+			continue;
 		}
 		else if (comand.compare("exit"))
 		{

@@ -141,3 +141,19 @@ std::ostream& operator<<(std::ostream& out, const Date& obj)
 	out << obj.getDay();
 	return out;
 }
+void Insert_and_sort(Vector<Date*>& vec, const Date& obj)
+{
+	size_t i = 0;
+	size_t length = vec.size();
+	Date* pobj = new Date;
+	*pobj = obj;
+	for (size_t i = 0; i < length; i++)
+	{
+		if (*pobj < *vec[i])
+		{
+			vec.insert(i, pobj);
+			return;
+		}
+	}
+	vec.push_back(pobj);
+}
