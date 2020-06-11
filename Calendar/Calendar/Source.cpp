@@ -90,6 +90,7 @@ int main()
 			E.unknown();
 		}
 	}
+	E.if_saved();
 	std::cout << "Exiting the program...\n";
 
 	return 0;

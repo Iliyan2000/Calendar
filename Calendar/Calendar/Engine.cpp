@@ -2,27 +2,111 @@
 
 Engine::Engine(const Vector<Booked*> &vec_b,
 	const Vector<Date*> &vec_h,
-	const char first_sym)
-	:booked(vec_b), holiday(vec_h)
+	const char first_sym,
+	const bool _saved)
+	:booked(vec_b), holiday(vec_h), saved(_saved)
 {
 	file[0] = first_sym;
 }
 
 void Engine::open()
 {
-
+	if (file[0] == '\0')//check if there is open file
+	{
+		std::cin.get();
+		std::cin.getline(file, FILENAME_LENGTH);
+		open_file();
+		saved = true;
+		return;
+	}
+	char temp_file_name[FILENAME_LENGTH];
+	std::cin.get();
+	std::cin.getline(temp_file_name, FILENAME_LENGTH);
+	if (saved)
+	{
+		close();
+		file[0] = '\0';
+		strcpy(file, temp_file_name);
+		open_file();
+		saved = true;
+		return;
+	}
+	std::string answer;
+	std::cout << "Would you like to save the changes before opening another calendar?[yes/no]\n>";
+	std::cin >> answer;
+	std::cin.ignore(IGNORE_LENGTH, '\n');
+	if (answer == "yes" || answer == "y")
+	{
+		save();
+	}
+	else if (answer == "no" || answer == "n")
+	{ }
+	else
+	{
+		std::cout << "Unknown comand. Unable to open new calendar.\n";
+		return;
+	}
+	close();
+	file[0] = '\0';
+	strcpy(file, temp_file_name);
+	open_file();
+	saved = true;
 }
-void Engine::close()
+void Engine::close(const bool exiting)
 {
-
+	std::cin.ignore(IGNORE_LENGTH, '\n');
+	if (file[0] == '\0')
+	{
+		std::cout << "There is no open file.\n";
+		return;
+	}
+	if (!exiting && !saved)
+	{
+		std::cout << "Would you like to save the changes before closing the calendar?[yes/no]\n>";
+		std::string answer;
+		std::cin >> answer;
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		if (answer == "no" || answer == "n")
+		{ }
+		else
+		{
+			save();
+		}
+	}
+	file[0] = '\0';
+	size_t length = booked.size();
+	for (size_t i = 0; i < length; i++)
+	{
+		booked.pop_back();
+	}
+	length = holiday.size();
+	for (size_t i = 0; i < length; i++)
+	{
+		holiday.pop_back();
+	}
+	if (!exiting)
+	std::cout << "File successfully closed.\n";
+	saved = false;
 }
 void Engine::save()
 {
-
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
+	saved = true;
 }
 void Engine::saveas()
 {
-
+	if (file[0] == '\0')
+	{
+		std::cin.ignore(IGNORE_LENGTH, '\n');
+		std::cout << "There is no open file.\n";
+		return;
+	}
+	saved = true;
 }
 void Engine::help()
 {
@@ -36,7 +120,7 @@ void Engine::help()
 		"unbook <date> <starttime> <endtime>			delete the commit from the calendar\n" <<
 		"exit							exists the program\n";
 }
-void Engine::book()
+void Engine::book(std::istream& in, const bool from_console)
 {
 	if (file[0] == '\0')
 	{
@@ -49,9 +133,9 @@ void Engine::book()
 	Time end_time;
 	std::string name;
 	std::string note;
-	std::cin >> date >> start_time >> end_time >> name;
-	std::cin.get();
-	std::getline(std::cin, note);
+	in >> date >> start_time >> end_time >> name;
+	in.get();
+	std::getline(in, note);
 	if (!(date.Check() && start_time.Check() && end_time.Check()))
 	{
 		std::cout << "Incorrect date or time!\n";
@@ -62,6 +146,7 @@ void Engine::book()
 	{
 		if (date == *holiday[i])
 		{
+			if (from_console)
 			std::cout << "This date is already a holiday.\n";
 			return;
 		}
@@ -71,7 +156,7 @@ void Engine::book()
 	if (start_time > end_time)
 	{
 		f = true;
-		std::cout << "Would you like your commit to continue to the next date?[yes/no]\n";
+		std::cout << "Would you like your commit to continue to the next date?[yes/no]\n>";
 		std::cin >> answer;
 		std::cin.ignore(IGNORE_LENGTH, '\n');
 		if (answer == "no" || answer == "n")
@@ -100,7 +185,8 @@ void Engine::book()
 					(B[j].getStartTime() >= booked[i]->getStartTime() && start_time <= booked[i]->getEndTime()) &&
 					(B[j].getEndTime() >= booked[i]->getStartTime() && end_time <= booked[i]->getEndTime()))
 				{
-					std::cout << "This date and time are commited.\n";
+					if (from_console)
+					std::cout << "This date and time are already commited.\n";
 					if (j == 1)
 					{
 						for (size_t t = 0; t < length; t++)
@@ -118,7 +204,9 @@ void Engine::book()
 			}
 			Insert_and_sort(booked, B[j]);
 		}
+		if (from_console)
 		std::cout << "Successfully commited.\n";
+		saved = false;
 	}
 	else
 	{
@@ -154,6 +242,7 @@ void Engine::unbook()
 				delete booked[i];
 				booked.erase(i);
 				std::cout << "Successfully deleted the commit.\n";
+				saved = false;
 				return;
 			}
 		}
@@ -179,6 +268,7 @@ void Engine::unbook()
 				delete booked[i];
 				booked.erase(i);
 				std::cout << "Successfully deleted the commit.\n";
+				saved = false;
 				return;
 			}
 		}
@@ -198,6 +288,7 @@ void Engine::agenda()
 	if (!date.Check())
 	{
 		std::cout << "Incorrect date!\n";
+		std::cin.ignore(IGNORE_LENGTH, '\n');
 		return;
 	}
 	bool f = false;
@@ -241,7 +332,7 @@ void Engine::find()
 		return;
 	}
 }
-void Engine::f_holiday()
+void Engine::f_holiday(std::istream& in, const bool from_console)
 {
 	if (file[0] == '\0')
 	{
@@ -250,14 +341,16 @@ void Engine::f_holiday()
 		return;
 	}
 	Date date;
-	std::cin >> date;
+	in >> date;
 	if (!date.Check())
 	{
 		std::cout << "Incorrect date!\n";
 		return;
 	}
 	Insert_and_sort(holiday, date);
+	if (from_console)
 	std::cout << "Successfully saved the date as holiday.\n";
+	saved = false;
 	if (booked.size() == 0)
 	{
 		return;
@@ -329,4 +422,60 @@ void Engine::unknown()
 {
 	std::cin.ignore(IGNORE_LENGTH, '\n');
 	std::cout << "Unknown command!\n";
+}
+void Engine::if_saved()
+{
+	if (file[0] == '\0')
+	{
+		return;
+	}
+	else if (saved)
+	{
+		close(true);
+		return;
+	}
+	std::cout << "Would you like to save the changes before exiting the program?[yes/no]\n>";
+	std::string answer;
+	std::cin >> answer;
+	//std::cin.ignore(IGNORE_LENGTH, '\n');
+	if (answer == "no" || answer == "n")
+	{
+		close(true);
+		return;
+	}
+	save();
+	close(true);
+}
+
+void Engine::open_file()
+{
+	std::ifstream stream(file);
+	if (!stream.is_open())
+	{
+		std::ofstream openfile(file);
+		openfile.close();
+		stream.open(file);
+		if (!stream.is_open())
+		{
+			std::cout << "Unable to open this file.\n";
+			file[0] = '\0';
+			return;
+		}
+	}
+	char type;
+	stream >> type;//reads the type of the first event
+	while (type == 'B' || type == 'H')
+	{
+		if (type == 'B')//reads cimmits from file
+		{
+			book(stream, false);
+		}
+		else//reads holidays from file
+		{
+			f_holiday(stream, false);
+		}
+		stream >> type;//reads the type of the next event
+	}
+	std::cout << "File successfully opened.\n";
+	stream.close();
 }
