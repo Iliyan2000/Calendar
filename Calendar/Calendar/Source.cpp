@@ -17,7 +17,7 @@ int main()
 		}
 		else if (!comand.compare("close"))
 		{
-			E.close();
+			E.close(false, true);
 			continue;
 		}
 		else if (!comand.compare("save"))

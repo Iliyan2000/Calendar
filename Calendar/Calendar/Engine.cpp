@@ -32,7 +32,7 @@ void Engine::open()
 		return;
 	}
 	std::string answer;
-	std::cout << "Would you like to save the changes before opening another calendar?[yes/no]\n>";
+	std::cout << "Would you like to save last changes before opening another calendar?[yes/no]\n>";
 	std::cin >> answer;
 	std::cin.ignore(IGNORE_LENGTH, '\n');
 	if (answer == "yes" || answer == "y")
@@ -52,8 +52,9 @@ void Engine::open()
 	open_file();
 	saved = true;
 }
-void Engine::close(const bool exiting)
+void Engine::close(const bool exiting, const bool directly)
 {
+	if (directly)
 	std::cin.ignore(IGNORE_LENGTH, '\n');
 	if (file[0] == '\0')
 	{
@@ -62,7 +63,7 @@ void Engine::close(const bool exiting)
 	}
 	if (!exiting && !saved)
 	{
-		std::cout << "Would you like to save the changes before closing the calendar?[yes/no]\n>";
+		std::cout << "Would you like to save last changes before closing the calendar?[yes/no]\n>";
 		std::string answer;
 		std::cin >> answer;
 		std::cin.ignore(IGNORE_LENGTH, '\n');
@@ -84,8 +85,8 @@ void Engine::close(const bool exiting)
 	{
 		holiday.pop_back();
 	}
-	if (!exiting)
-	std::cout << "File successfully closed.\n";
+	if (!exiting && directly)
+	std::cout << "Successfully closed " << ReturnFile_name(file) << '\n';
 	saved = false;
 }
 void Engine::save()
@@ -96,6 +97,38 @@ void Engine::save()
 		std::cout << "There is no open file.\n";
 		return;
 	}
+	else if (saved)
+	{
+		std::cout << "It is already saved.\n";
+		return;
+	}
+	std::ofstream stream(file);
+	if (!stream.is_open())
+	{
+		std::cout << "Unable to save " << ReturnFile_name(file) << '\n';
+		return;
+	}
+	size_t length = booked.size();
+	for (size_t i = 0; i < length; i++)
+	{
+		stream << "B " << booked[i]->getDate() << ' ' <<
+			booked[i]->getStartTime() << ' ' <<
+			booked[i]->getEndTime() << ' ' <<
+			booked[i]->getName() << '\n';
+		if (booked[i]->getNote() == "")
+		{
+			stream << '-';
+		}
+		stream << booked[i]->getNote() << '\n';
+	}
+	length = holiday.size();
+	for (size_t i = 0; i < length; i++)
+	{
+		stream << "H " << *holiday[i] << '\n';
+	}
+	stream << '$';
+	stream.close();
+	std::cout << "Successfully saved " << ReturnFile_name(file) << '\n';
 	saved = true;
 }
 void Engine::saveas()
@@ -133,9 +166,16 @@ void Engine::book(std::istream& in, const bool from_console)
 	Time end_time;
 	std::string name;
 	std::string note;
-	in >> date >> start_time >> end_time >> name;
-	in.get();
+	//char get;
+	in >> date; in.get();
+	in >> start_time; in.get();
+	in >> end_time; in.get();
+	in >> name; in.get();
 	std::getline(in, note);
+	if (note == "-")
+	{
+		note = "";
+	}
 	if (!(date.Check() && start_time.Check() && end_time.Check()))
 	{
 		std::cout << "Incorrect date or time!\n";
@@ -356,7 +396,7 @@ void Engine::f_holiday(std::istream& in, const bool from_console)
 		return;
 	}
 	size_t i = 0;
-	while (date >= booked[i]->getDate())
+	while (i < booked.size() && date >= booked[i]->getDate())
 	{
 		if (date == booked[i]->getDate())
 		{
@@ -434,7 +474,7 @@ void Engine::if_saved()
 		close(true);
 		return;
 	}
-	std::cout << "Would you like to save the changes before exiting the program?[yes/no]\n>";
+	std::cout << "Would you like to save last changes before exiting the program?[yes/no]\n>";
 	std::string answer;
 	std::cin >> answer;
 	//std::cin.ignore(IGNORE_LENGTH, '\n');
@@ -457,7 +497,7 @@ void Engine::open_file()
 		stream.open(file);
 		if (!stream.is_open())
 		{
-			std::cout << "Unable to open this file.\n";
+			std::cout << "Unable to open " << ReturnFile_name(file) << '\n';
 			file[0] = '\0';
 			return;
 		}
@@ -476,6 +516,26 @@ void Engine::open_file()
 		}
 		stream >> type;//reads the type of the next event
 	}
-	std::cout << "File successfully opened.\n";
+	std::cout << "Successfully opened " << ReturnFile_name(file) << '\n';
 	stream.close();
+}
+std::string Engine::ReturnFile_name(const char* file_path)
+{
+	size_t i = 0;
+	size_t index = 0;
+	while (file_path[i] != '\0')
+	{
+		if (file_path[i] == '\\')
+		{
+			index = i;
+		}
+		i++;
+	}
+	std::string file_name = "";
+	while (file_path[index] != '\0')
+	{
+		file_name += file_path[index];
+		index++;
+	}
+	return file_name;
 }

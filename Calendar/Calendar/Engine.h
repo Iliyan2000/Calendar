@@ -11,8 +11,8 @@ public:
 		const bool _saved = false);
 
 	void open();//check
-	void close(const bool exiting = false);//check
-	void save();
+	void close(const bool exiting = false, const bool directly = false);//check
+	void save();//check
 	void saveas();
 	void help();
 	void book(std::istream& in = std::cin, const bool from_console = true);//check
@@ -37,5 +37,6 @@ private:
 	char file[FILENAME_LENGTH];
 	bool saved;
 	void open_file();
+	std::string ReturnFile_name(const char* file_path);
 
 };
