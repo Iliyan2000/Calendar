@@ -52,15 +52,8 @@ void Engine::open()
 	open_file();
 	saved = true;
 }
-void Engine::close(const bool exiting, const bool directly)
+void Engine::close(const bool exiting)
 {
-	if (directly)
-	std::cin.ignore(IGNORE_LENGTH, '\n');
-	if (file[0] == '\0')
-	{
-		std::cout << "There is no open file.\n";
-		return;
-	}
 	if (!exiting && !saved)
 	{
 		std::cout << "Would you like to save last changes before closing the calendar?[yes/no]\n>";
@@ -85,19 +78,13 @@ void Engine::close(const bool exiting, const bool directly)
 	{
 		holiday.pop_back();
 	}
-	if (!exiting && directly)
+	if (!exiting)
 	std::cout << "Successfully closed " << ReturnFile_name(file) << '\n';
 	saved = false;
 }
 void Engine::save()
 {
-	if (file[0] == '\0')
-	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
-	}
-	else if (saved)
+	if (saved)
 	{
 		std::cout << "It is already saved.\n";
 		return;
@@ -153,47 +140,22 @@ void Engine::help()
 		"unbook <date> <starttime> <endtime>			delete the commit from the calendar\n" <<
 		"exit							exists the program\n";
 }
-void Engine::book(std::istream& in, const bool from_console)
+bool Engine::book(const Booked& B, const bool from_console)
 {
-	if (file[0] == '\0')
-	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
-	}
-	Date date;
-	Time start_time;
-	Time end_time;
-	std::string name;
-	std::string note;
-	//char get;
-	in >> date; in.get();
-	in >> start_time; in.get();
-	in >> end_time; in.get();
-	in >> name; in.get();
-	std::getline(in, note);
-	if (note == "-")
-	{
-		note = "";
-	}
-	if (!(date.Check() && start_time.Check() && end_time.Check()))
-	{
-		std::cout << "Incorrect date or time!\n";
-		return;
-	}
+
 	size_t length = holiday.size();
 	for (size_t i = 0; i < length; i++)
 	{
-		if (date == *holiday[i])
+		if (B.getDate() == *holiday[i])
 		{
 			if (from_console)
 			std::cout << "This date is already a holiday.\n";
-			return;
+			return false;
 		}
 	}
 	std::string answer = "yes";
 	bool f = false;
-	if (start_time > end_time)
+	if (B.getStartTime() > B.getEndTime())
 	{
 		f = true;
 		std::cout << "Would you like your commit to continue to the next date?[yes/no]\n>";
@@ -202,28 +164,28 @@ void Engine::book(std::istream& in, const bool from_console)
 		if (answer == "no" || answer == "n")
 		{
 			std::cout << "The commit not saved.\n";
-			return;
+			return false;
 		}
 	}
 	if (answer == "yes" || answer == "y")
 	{
-		Vector<Booked> B;
-		B.push_back(Booked(date, start_time, end_time, name, note));
+		Vector<Booked> vec;
+		vec.push_back(B);
 		if (f)
 		{
 			Booked b;
-			B[0].Split(b);
-			B.push_back(b);
+			vec[0].Split(b);
+			vec.push_back(b);
 		}
-		size_t length_B = B.size();
-		for (size_t j = 0; j < length_B; j++)
+		size_t length_vec = vec.size();
+		for (size_t j = 0; j < length_vec; j++)
 		{
 			length = booked.size();
 			for (size_t i = 0; i < length; i++)
 			{
-				if (B[j].getDate() == booked[i]->getDate() &&
-					(B[j].getStartTime() >= booked[i]->getStartTime() && start_time <= booked[i]->getEndTime()) &&
-					(B[j].getEndTime() >= booked[i]->getStartTime() && end_time <= booked[i]->getEndTime()))
+				if (vec[j].getDate() == booked[i]->getDate() &&
+					(vec[j].getStartTime() >= booked[i]->getStartTime() && B.getStartTime() <= booked[i]->getEndTime()) &&
+					(vec[j].getEndTime() >= booked[i]->getStartTime() && B.getEndTime() <= booked[i]->getEndTime()))
 				{
 					if (from_console)
 					std::cout << "This date and time are already commited.\n";
@@ -231,7 +193,7 @@ void Engine::book(std::istream& in, const bool from_console)
 					{
 						for (size_t t = 0; t < length; t++)
 						{
-							if (B[j] == *booked[t])
+							if (vec[j] == *booked[t])
 							{
 								delete booked[t];
 								booked.erase(t);
@@ -239,28 +201,24 @@ void Engine::book(std::istream& in, const bool from_console)
 							}
 						}
 					}
-					return;
+					return false;
 				}
 			}
-			Insert_and_sort(booked, B[j]);
+			Insert_and_sort(booked, vec[j]);
 		}
 		if (from_console)
 		std::cout << "Successfully commited.\n";
 		saved = false;
+		return true;
 	}
 	else
 	{
 		std::cout << "unknown command!\n";
+		return false;
 	}
 }
 void Engine::unbook()
 {
-	if (file[0] == '\0')
-	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
-	}
 	Date date;
 	Time start_time;
 	Time end_time;
@@ -317,12 +275,6 @@ void Engine::unbook()
 }
 void Engine::agenda()
 {
-	if (file[0] == '\0')
-	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
-	}
 	Date date;
 	std::cin >> date;
 	if (!date.Check())
@@ -351,35 +303,75 @@ void Engine::agenda()
 		std::cout << "There are no commitments for this date.\n";
 	}
 }
-void Engine::change()
+void Engine::change(const Date& date, const Time& start_time)
 {
-	if (file[0] == '\0')
+	std::string option;
+	std::cin >> option;
+	size_t length = booked.size();
+	for (size_t i = 0; i < length; i++)
 	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
+		if (booked[i]->getDate() == date &&
+			booked[i]->getStartTime() == start_time)
+		{
+			if (option == "date")
+			{
+				ForDate fd = *booked[i];
+				fd.Change();
+				if (book(fd))
+				{
+					delete booked[i];
+					booked.erase(i);
+				}
+				return;
+			}
+			else if (option == "starttime")
+			{
+				std::cout << "Still in progress.\n";
+				return;
+				ForStartTime fst = *booked[i];
+				Booked temp = *booked[i];
+				fst.Change();
+				delete booked[i];
+				booked.erase(i);
+				if (!(book(fst)))
+				{
+					Insert_and_sort(booked, temp);
+				}
+			}
+			else if (option == "endtime")
+			{
+				std::cout << "Still in progress.\n";
+				return;
+			}
+			else if (option == "name")
+			{
+				std::string _name;
+				std::cin >> _name;
+				booked[i]->setName(_name);
+				return;
+			}
+			else if (option == "note")
+			{
+				std::string _note;
+				std::cin >> _note;
+				booked[i]->setName(_note);
+				return;
+			}
+			else
+			{
+				std::cout << "Unknown option.\n";
+				return;
+			}
+		}
 	}
-	Date date;
-	Time start_time;
-	std::cin >> date >> start_time;
+	std::cout << "There is no matching commit.\n";
 }
 void Engine::find()
 {
-	if (file[0] == '\0')
-	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
-	}
+	
 }
 void Engine::f_holiday(std::istream& in, const bool from_console)
 {
-	if (file[0] == '\0')
-	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
-	}
 	Date date;
 	in >> date;
 	if (!date.Check())
@@ -424,39 +416,19 @@ void Engine::f_holiday(std::istream& in, const bool from_console)
 }
 void Engine::busydays()
 {
-	if (file[0] == '\0')
-	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
-	}
+
 }
 void Engine::findslot()
 {
-	if (file[0] == '\0')
-	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
-	}
+
 }
 void Engine::findslotwith()
 {
-	if (file[0] == '\0')
-	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
-	}
+
 }
 void Engine::merge()
 {
-	if (file[0] == '\0')
-	{
-		std::cin.ignore(IGNORE_LENGTH, '\n');
-		std::cout << "There is no open file.\n";
-		return;
-	}
+
 }
 void Engine::unknown()
 {
@@ -477,7 +449,6 @@ void Engine::if_saved()
 	std::cout << "Would you like to save last changes before exiting the program?[yes/no]\n>";
 	std::string answer;
 	std::cin >> answer;
-	//std::cin.ignore(IGNORE_LENGTH, '\n');
 	if (answer == "no" || answer == "n")
 	{
 		close(true);
@@ -485,6 +456,14 @@ void Engine::if_saved()
 	}
 	save();
 	close(true);
+}
+bool Engine::Check_for_file()
+{
+	if (file[0] == '\0')
+	{
+		return false;
+	}
+	return true;
 }
 
 void Engine::open_file()
@@ -508,7 +487,26 @@ void Engine::open_file()
 	{
 		if (type == 'B')//reads cimmits from file
 		{
-			book(stream, false);
+			Date date;							   //declaring
+			Time start_time;					   //
+			Time end_time;						   //and
+			std::string name;					   //
+			std::string note;					   //
+			stream >> date; stream.get();		   //reading
+			stream >> start_time; stream.get();    //info about
+			stream >> end_time; stream.get();	   //the
+			stream >> name; stream.get();		   //commit
+			std::getline(stream, note);			   //
+			if (note == "-")
+			{
+				note = "";
+			}
+			if (!(date.Check() && start_time.Check() && end_time.Check()))
+			{
+				std::cout << "Incorrect date or time!\n";
+				return;
+			}
+			book(Booked(date, start_time, end_time, name, note), false);
 		}
 		else//reads holidays from file
 		{

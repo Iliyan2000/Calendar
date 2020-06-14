@@ -148,6 +148,7 @@
     <ClInclude Include="Booked.h" />
     <ClInclude Include="Date.h" />
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="Inheritance_Booked.h" />
     <ClInclude Include="Time.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

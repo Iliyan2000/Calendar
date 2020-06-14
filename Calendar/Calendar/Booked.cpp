@@ -27,6 +27,8 @@ void Booked::Split(Booked& other)
 	d.AddDay();
 	other.setDate(d);
 }
+void Booked::Change()
+{ }
 bool Booked::operator==(const Booked& other)
 {
 	if (date == other.date &&
